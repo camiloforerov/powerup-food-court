@@ -1,0 +1,19 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/usuarios_db
+    username: root
+    password: ${db_password}
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+appDescription: "Usuarios"
+appVersion: "1.0.0"
