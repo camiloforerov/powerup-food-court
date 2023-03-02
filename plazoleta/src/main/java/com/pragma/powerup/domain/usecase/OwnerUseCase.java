@@ -49,15 +49,23 @@ public class OwnerUseCase implements IOwnerServicePort {
 
     /**
      * Updates a dish with optional parameters of price and/or description
+     * Checks beforehand if the user is the owner of the dish
      *
      * @param dishId - dish id
      * @param description - optional description
+     * @param ownerEmail - restaurant owner email
      * @param price - optional price
      * */
     @Override
-    public DishModel updateDish(Long dishId, Double price, String description) {
-        // ToDo... Verify the owner is owner of the dish
-        DishModel dishModel = this.dishPersistentPort.getDishById(dishId);
+    public DishModel updateDish(Long dishId, Double price, String description, String ownerEmail) {
+        RestaurantModel restaurantModel = this.getRestaurantByOwnerEmail(ownerEmail);
+
+        List<DishModel> restaurantDishes = this.dishPersistentPort.getDishesByRestaurantId(restaurantModel.getId());
+
+        DishModel dishModel = restaurantDishes.stream()
+                .filter(dish -> dish.getId().equals(dishId))
+                .findAny().orElse(null);
+
         if (dishModel == null) {
             throw new DishDoesNotExistException("Dish doesn't exists");
         }
@@ -110,6 +118,7 @@ public class OwnerUseCase implements IOwnerServicePort {
      *
      * @param dishId - dish id
      * @param newState - new boolean state
+     * @param ownerEmail - restaurant owner email
      * @throws DishDoesNotExistException - dish couldn't be found
      * @return dish model with the updated dish
      * */

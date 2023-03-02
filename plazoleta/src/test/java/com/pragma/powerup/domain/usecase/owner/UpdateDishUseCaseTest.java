@@ -1,14 +1,12 @@
 package com.pragma.powerup.domain.usecase.owner;
 
 import com.pragma.powerup.domain.exceptions.DishDoesNotExistException;
-import com.pragma.powerup.domain.exceptions.UserDoesNotExistException;
-import com.pragma.powerup.domain.factory.FactoryAdminUseCase;
 import com.pragma.powerup.domain.factory.FactoryOwnerUseCase;
 import com.pragma.powerup.domain.model.CategoryModel;
 import com.pragma.powerup.domain.model.DishModel;
 import com.pragma.powerup.domain.model.RestaurantModel;
-import com.pragma.powerup.domain.spi.ICategoryPersistencePort;
 import com.pragma.powerup.domain.spi.IDishPersistentPort;
+import com.pragma.powerup.domain.spi.IRestaurantPersistentPort;
 import com.pragma.powerup.domain.usecase.OwnerUseCase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,65 +15,76 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Collections;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class UpdateDishUseCaseTest {
+class UpdateDishUseCaseTest {
     @InjectMocks
     OwnerUseCase ownerUseCase;
-
     @Mock
     IDishPersistentPort dishPersistentPort;
+    @Mock
+    IRestaurantPersistentPort restaurantPersistentPort;
 
     @Test
     void mustUpdateDishDescription() {
-        // Given
+        String ownerEmail = "owner@mail.com";
         CategoryModel categoryModel = FactoryOwnerUseCase.getCategoryModel();
         RestaurantModel restaurantModel = FactoryOwnerUseCase.getRestaurantModel();
         DishModel dishModel = FactoryOwnerUseCase.getCreatedDishModel(categoryModel, restaurantModel);
-
         Double price = null;
         String description = "New description";
-        // When
-        when(dishPersistentPort.getDishById(any())).thenReturn(dishModel);
-        when(dishPersistentPort.saveDish(dishModel)).thenReturn(dishModel);
 
-        // Then
-        DishModel dishModelUpdated = ownerUseCase.updateDish(any(), price, description);
+        when(dishPersistentPort.getDishesByRestaurantId(any()))
+                .thenReturn(Collections.singletonList(dishModel));
+        when(restaurantPersistentPort.getRestaurantByOwnerEmail(ownerEmail))
+                .thenReturn(restaurantModel);
+        when(dishPersistentPort.saveDish(dishModel))
+                .thenReturn(dishModel);
+
+        DishModel dishModelUpdated = ownerUseCase.updateDish(dishModel.getId(), price, description, ownerEmail);
         Assertions.assertEquals(dishModelUpdated.getDescription(), description);
     }
 
     @Test
     void mustUpdateDishPrice() {
+        String ownerEmail = "owner@mail.com";
         CategoryModel categoryModel = FactoryOwnerUseCase.getCategoryModel();
         RestaurantModel restaurantModel = FactoryOwnerUseCase.getRestaurantModel();
         DishModel dishModel = FactoryOwnerUseCase.getCreatedDishModel(categoryModel, restaurantModel);
-
         Double price = 43243D;
         String description = null;
-        // When
-        when(dishPersistentPort.getDishById(any())).thenReturn(dishModel);
-        when(dishPersistentPort.saveDish(dishModel)).thenReturn(dishModel);
 
-        // Then
-        DishModel dishModelUpdated = ownerUseCase.updateDish(any(), price, description);
+        when(dishPersistentPort.getDishesByRestaurantId(any()))
+                .thenReturn(Collections.singletonList(dishModel));
+        when(restaurantPersistentPort.getRestaurantByOwnerEmail(ownerEmail))
+                .thenReturn(restaurantModel);
+        when(dishPersistentPort.saveDish(dishModel))
+                .thenReturn(dishModel);
+
+        DishModel dishModelUpdated = ownerUseCase.updateDish(dishModel.getId(), price, description, ownerEmail);
         Assertions.assertEquals(dishModelUpdated.getPrice(), price);
     }
 
     @Test
     void throwDishDoesNotExistWhenAttemptSearchWhenUpdating() {
-        // Given
+        String ownerEmail = "owner@mail.com";
         Double price = 43243D;
         String description = "New description";
-        // When
-        when(dishPersistentPort.getDishById(any())).thenReturn(null);
+        RestaurantModel restaurantModel = FactoryOwnerUseCase.getRestaurantModel();
 
-        // Then
+        when(dishPersistentPort.getDishesByRestaurantId(any()))
+                .thenReturn(Collections.emptyList());
+        when(restaurantPersistentPort.getRestaurantByOwnerEmail(ownerEmail))
+                .thenReturn(restaurantModel);
+
         Assertions.assertThrows(
                 DishDoesNotExistException.class,
                 () -> {
-                    ownerUseCase.updateDish(1L, price, description);
+                    ownerUseCase.updateDish(1L, price, description, ownerEmail);
                 }
         );
     }

@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 @Data
 public class CreateRestaurantRequestDto {
     @NotBlank(message = "Name cannot be blank")
-    @Pattern(regexp = "(?!^\\d+$)^\\w+$")
+    @Pattern(regexp = "(?!^\\d+$)(?!^\\d+( \\d+)*$)^\\w+( \\w+)*$")
     private String name;
     @NotBlank(message = "Address cannot be blank")
     private String address;

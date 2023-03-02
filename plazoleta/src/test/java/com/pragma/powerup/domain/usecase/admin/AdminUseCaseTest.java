@@ -1,5 +1,6 @@
 package com.pragma.powerup.domain.usecase.admin;
 
+import com.pragma.powerup.domain.exceptions.OwnerAlreadyHasRestaurantException;
 import com.pragma.powerup.domain.exceptions.UserDoesNotExistException;
 import com.pragma.powerup.domain.factory.FactoryAdminUseCase;
 import com.pragma.powerup.domain.model.RestaurantModel;
@@ -19,38 +20,59 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class AdminUseCaseTest {
-
     @InjectMocks
     AdminUseCase adminUseCase;
-
     @Mock
     IUserServicePort userServicePort;
-
     @Mock
     IRestaurantPersistentPort restaurantPersistentPort;
 
     @Test
     void mustCreateRestaurantCorrectly() {
-        //Given
+        String ownerEmail = "owner@mail.com";
         RestaurantModel restaurantModel = FactoryAdminUseCase.getRestaurantModel();
-        // When
-        when(userServicePort.userIsRestaurantOwner(restaurantModel.getOwnerEmail())).thenReturn(true);
+
+        when(userServicePort.userIsRestaurantOwner(restaurantModel.getOwnerEmail()))
+                .thenReturn(true);
+        when(restaurantPersistentPort.getRestaurantByOwnerEmail(ownerEmail))
+                .thenReturn(null);
 
         adminUseCase.createRestaurant(restaurantModel);
-        // Then
         verify(restaurantPersistentPort).saveRestaurant(any(RestaurantModel.class));
     }
 
     @Test
     void throwsUserDoesNotExistsWhenAttemptToCreateRestaurant() {
-        // Given
+        String ownerEmail = "owner@mail.com";
         RestaurantModel restaurantModel = FactoryAdminUseCase.getRestaurantModel();
-        // When
-        when(userServicePort.userIsRestaurantOwner(restaurantModel.getOwnerEmail())).thenReturn(false);
 
-        // Then
+        when(userServicePort.userIsRestaurantOwner(restaurantModel.getOwnerEmail()))
+                .thenReturn(false);
+        when(restaurantPersistentPort.getRestaurantByOwnerEmail(ownerEmail))
+                .thenReturn(null);
+
         Assertions.assertThrows(
                 UserDoesNotExistException.class,
+                () -> {
+                    adminUseCase.createRestaurant(restaurantModel);
+                }
+        );
+    }
+
+    @Test
+    void throwsOwnerAlreadyHasRestaurantWhenAttemptToCreateRestaurant() {
+        String ownerEmail = "owner@mail.com";
+        RestaurantModel restaurantModel = FactoryAdminUseCase.getRestaurantModel();
+        RestaurantModel restaurantModelExistent = FactoryAdminUseCase.getRestaurantModel();
+        restaurantModel.setOwnerEmail(ownerEmail);
+
+        when(userServicePort.userIsRestaurantOwner(restaurantModel.getOwnerEmail()))
+                .thenReturn(true);
+        when(restaurantPersistentPort.getRestaurantByOwnerEmail(ownerEmail))
+                .thenReturn(restaurantModelExistent);
+
+        Assertions.assertThrows(
+                OwnerAlreadyHasRestaurantException.class,
                 () -> {
                     adminUseCase.createRestaurant(restaurantModel);
                 }

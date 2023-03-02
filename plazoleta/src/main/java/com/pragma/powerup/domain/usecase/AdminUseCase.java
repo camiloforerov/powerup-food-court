@@ -1,6 +1,7 @@
 package com.pragma.powerup.domain.usecase;
 
 import com.pragma.powerup.domain.api.IAdminServicePort;
+import com.pragma.powerup.domain.exceptions.OwnerAlreadyHasRestaurantException;
 import com.pragma.powerup.domain.exceptions.UserDoesNotExistException;
 import com.pragma.powerup.domain.model.RestaurantModel;
 import com.pragma.powerup.domain.spi.IRestaurantPersistentPort;
@@ -23,6 +24,11 @@ public class AdminUseCase implements IAdminServicePort {
     public void createRestaurant(RestaurantModel restaurantModel) {
         if (!userServicePort.userIsRestaurantOwner(restaurantModel.getOwnerEmail())) {
             throw new UserDoesNotExistException("User doesn't exists");
+        }
+        RestaurantModel restaurantModel1 = restaurantPersistentPort.
+                getRestaurantByOwnerEmail(restaurantModel.getOwnerEmail());
+        if (restaurantModel1 != null) {
+            throw new OwnerAlreadyHasRestaurantException("Owner already has a restaurant registered");
         }
         this.restaurantPersistentPort.saveRestaurant(restaurantModel);
     }

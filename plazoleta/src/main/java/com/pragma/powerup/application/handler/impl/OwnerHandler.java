@@ -66,9 +66,15 @@ public class OwnerHandler implements IOwnerHandler {
      * */
     @Override
     public void updateDish(UpdateDishRequestDto updateDishRequestDto) {
-        this.ownerServicePort.updateDish(updateDishRequestDto.getDishId(),
-                updateDishRequestDto.getPrice(),
-                updateDishRequestDto.getDescription());
+        String ownerEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        try {
+            this.ownerServicePort.updateDish(updateDishRequestDto.getDishId(),
+                    updateDishRequestDto.getPrice(),
+                    updateDishRequestDto.getDescription(),
+                    ownerEmail);
+        } catch (DishDoesNotExistException | NoRestaurantForOwnerFoundException ex) {
+            throw new NoDataFoundException(ex.getMessage());
+        }
     }
 
 
