@@ -1,12 +1,14 @@
 package com.pragma.powerup.infrastructure.configuration;
 
 import com.pragma.powerup.domain.api.IAdminServicePort;
+import com.pragma.powerup.domain.api.IClientServicePort;
 import com.pragma.powerup.domain.api.IOwnerServicePort;
 import com.pragma.powerup.domain.api.IUserServicePort;
 import com.pragma.powerup.domain.spi.IAuthPasswordEncoderPort;
 import com.pragma.powerup.domain.spi.IRolePersistentPort;
 import com.pragma.powerup.domain.spi.IUserPersistentPort;
 import com.pragma.powerup.domain.usecase.AdminUseCase;
+import com.pragma.powerup.domain.usecase.ClientUseCase;
 import com.pragma.powerup.domain.usecase.OwnerUseCase;
 import com.pragma.powerup.domain.usecase.UserUseCase;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.RolePersistenceAdapter;
@@ -59,6 +61,12 @@ public class BeanConfiguration {
     @Bean
     public IOwnerServicePort ownerServicePort() {
         return new OwnerUseCase(this.userPersistentPort(), this.rolePersistentPort(), this.authPasswordEncoderPort());
+    }
+
+    @Bean
+    public IClientServicePort clientServicePort() {
+        return new ClientUseCase(this.userPersistentPort(), this.rolePersistentPort(),
+                this.authPasswordEncoderPort());
     }
 
     @Bean

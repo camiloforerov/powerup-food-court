@@ -43,6 +43,7 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/users/v1/auth/login").permitAll()
+                .antMatchers("/users/v1/auth/client").permitAll()
                 .antMatchers("/users/v1/admin/**").hasRole("ADMIN")
                 .antMatchers("/users/v1/owner/**").hasRole("OWNER")
                 .anyRequest()
