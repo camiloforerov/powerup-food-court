@@ -6,9 +6,13 @@ import com.pragma.powerup.infrastructure.out.jpa.entity.RestaurantEntity;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IRestaurantEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IRestaurantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class RestaurantPersistenceAdapter implements IRestaurantPersistentPort {
@@ -29,5 +33,19 @@ public class RestaurantPersistenceAdapter implements IRestaurantPersistentPort {
     public Optional<RestaurantModel> getRestaurantById(Long restaurantId) {
         RestaurantEntity restaurantEntity = this.restaurantRepository.findById(restaurantId).orElse(null);
         return Optional.ofNullable(this.restaurantEntityMapper.toModelNoDishes(restaurantEntity));
+    }
+
+    @Override
+    public List<RestaurantModel> listByPageAndElements(int pageNumber, int numbersOfElements) {
+        PageRequest sortedByNameAsc = PageRequest.of(
+                pageNumber,
+                numbersOfElements,
+                Sort.by("name").ascending()
+        );
+        Page<RestaurantEntity> restaurants = this.restaurantRepository.findAll(sortedByNameAsc);
+
+        return restaurants.getContent().stream()
+                .map(res -> this.restaurantEntityMapper.toModelNoDishes(res))
+                .collect(Collectors.toList());
     }
 }

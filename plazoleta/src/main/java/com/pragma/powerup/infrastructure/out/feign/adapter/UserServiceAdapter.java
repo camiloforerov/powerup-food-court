@@ -46,7 +46,10 @@ public class UserServiceAdapter implements IUserServicePort {
     }
 
     /**
-     * ToDo: HU 6
+     * Calls user service to create employee's user entity
+     *
+     * @param userModel - employee information
+     * @param roleId - employee role id
      * */
     @Override
     public UserModel createEmployee(UserModel userModel, Long roleId) {

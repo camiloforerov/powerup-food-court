@@ -37,6 +37,7 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/food-court/v1/owner/**").hasRole("OWNER")
                 .antMatchers("/food-court/v1/admin/**").hasRole("ADMIN")
+                .antMatchers("/food-court/v1/client/**").hasRole("CLIENT")
                 .anyRequest()
                 .authenticated();
 

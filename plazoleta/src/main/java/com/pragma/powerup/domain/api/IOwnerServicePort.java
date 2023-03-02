@@ -8,7 +8,7 @@ import com.pragma.powerup.domain.model.userservice.UserModel;
 public interface IOwnerServicePort {
     DishModel createDish(DishModel dishModel, RestaurantModel restaurantModel, Long categoryName);
 
-    DishModel updateDish(Long dishId, Double price, String description);
+    DishModel updateDish(Long dishId, Double price, String description, String ownerEmail);
 
     RestaurantModel getRestaurantByOwnerEmail(String ownerEmail);
 
