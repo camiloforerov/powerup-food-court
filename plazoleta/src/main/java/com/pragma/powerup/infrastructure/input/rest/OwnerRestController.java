@@ -3,8 +3,10 @@ package com.pragma.powerup.infrastructure.input.rest;
 import com.pragma.powerup.application.dto.request.CreateDishRequestDto;
 import com.pragma.powerup.application.dto.request.CreateEmployeeRequestDto;
 import com.pragma.powerup.application.dto.request.UpdateDishRequestDto;
+import com.pragma.powerup.application.dto.request.UpdateDishStateRequestDto;
 import com.pragma.powerup.application.dto.response.CreatedDishResponseDto;
 import com.pragma.powerup.application.dto.response.RestaurantEmployeeResponseDto;
+import com.pragma.powerup.application.dto.response.UpdatedDishResponseDto;
 import com.pragma.powerup.application.handler.IOwnerHandler;
 import com.pragma.powerup.infrastructure.out.feign.dto.response.CreateEmployeeResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,5 +55,16 @@ public class OwnerRestController {
     public ResponseEntity<RestaurantEmployeeResponseDto> createEmployee(
             @RequestBody @Valid CreateEmployeeRequestDto createEmployeeRequestDto) {
         return new ResponseEntity<>(this.ownerHandler.createEmployee(createEmployeeRequestDto), HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Change state of a dish")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "State changed", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Dish couldn't be found", content = @Content)
+    })
+    @PutMapping("/dish-state")
+    public ResponseEntity<UpdatedDishResponseDto> changeDishState(
+            @RequestBody @Valid UpdateDishStateRequestDto updateDishStateRequestDto) {
+        return new ResponseEntity<>(this.ownerHandler.updateDishState(updateDishStateRequestDto), HttpStatus.OK);
     }
 }

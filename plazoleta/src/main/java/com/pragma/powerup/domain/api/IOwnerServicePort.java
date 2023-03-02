@@ -13,4 +13,6 @@ public interface IOwnerServicePort {
     RestaurantModel getRestaurantByOwnerEmail(String ownerEmail);
 
     RestaurantEmployeeModel createEmployee(UserModel userModel, Long roleId, Long restaurantId);
+
+    DishModel updateDishState(Long dishId, boolean newState, String ownerEmail);
 }

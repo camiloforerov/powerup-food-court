@@ -13,6 +13,7 @@ import com.pragma.powerup.domain.model.userservice.UserModel;
 import com.pragma.powerup.domain.spi.*;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -55,6 +56,7 @@ public class OwnerUseCase implements IOwnerServicePort {
      * */
     @Override
     public DishModel updateDish(Long dishId, Double price, String description) {
+        // ToDo... Verify the owner is owner of the dish
         DishModel dishModel = this.dishPersistentPort.getDishById(dishId);
         if (dishModel == null) {
             throw new DishDoesNotExistException("Dish doesn't exists");
@@ -101,5 +103,32 @@ public class OwnerUseCase implements IOwnerServicePort {
         return this.restaurantEmployeePersistentPort.save(new RestaurantEmployeeModel(
                 createdUserModel.getEmail(), restaurantModel.get())
         );
+    }
+
+    /**
+     * Updates a dish state to active or inactive. Checks beforehand if the user is the owner of the dish
+     *
+     * @param dishId - dish id
+     * @param newState - new boolean state
+     * @throws DishDoesNotExistException - dish couldn't be found
+     * @return dish model with the updated dish
+     * */
+    @Override
+    public DishModel updateDishState(Long dishId, boolean newState, String ownerEmail) throws DishDoesNotExistException {
+        RestaurantModel restaurantModel = this.getRestaurantByOwnerEmail(ownerEmail);
+
+        List<DishModel> restaurantDishes = this.dishPersistentPort.getDishesByRestaurantId(restaurantModel.getId());
+
+        DishModel dishFound = restaurantDishes.stream()
+                .filter(dishModel -> dishModel.getId().equals(dishId))
+                .findAny().orElse(null);
+
+        if (dishFound == null) {
+            throw new DishDoesNotExistException("Dish doesn't exists");
+        }
+
+        dishFound.setActive(newState);
+
+        return this.dishPersistentPort.saveDish(dishFound);
     }
 }
