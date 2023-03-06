@@ -6,6 +6,8 @@ import com.pragma.powerup.infrastructure.out.jpa.entity.DishEntity;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IDishEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IDishRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +33,23 @@ public class DishPersistenceAdapter implements IDishPersistentPort {
     public List<DishModel> getDishesByRestaurantId(Long restaurantId) {
         List<DishEntity> dishesEntity = this.dishRepository.findByRestaurantId(restaurantId);
         return dishesEntity.stream()
+                .map(dishE -> this.dishEntityMapper.toModel(dishE))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DishModel> listDishesByRestaurantPageable(
+            Long restaurantId,
+            int pageNumber,
+            int elementsPerPage
+    ) {
+        PageRequest pageable = PageRequest.of(
+                pageNumber,
+                elementsPerPage
+        );
+        List<DishEntity> dishEntities = this.dishRepository
+                .findByRestaurantIdAndActive(restaurantId, true, pageable);
+        return dishEntities.stream()
                 .map(dishE -> this.dishEntityMapper.toModel(dishE))
                 .collect(Collectors.toList());
     }
