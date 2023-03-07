@@ -1,15 +1,23 @@
 package com.pragma.powerup.domain.usecase;
 
+import com.pragma.powerup.domain.Constants;
 import com.pragma.powerup.domain.api.IClientServicePort;
+import com.pragma.powerup.domain.exceptions.ClientAlreadyHasOrderInProcessException;
+import com.pragma.powerup.domain.exceptions.DishDoesNotExistException;
+import com.pragma.powerup.domain.exceptions.DishesCannotBeEmptyException;
 import com.pragma.powerup.domain.exceptions.RestaurantDoesNotExistException;
 import com.pragma.powerup.domain.model.CategoryWithDishesModel;
 import com.pragma.powerup.domain.model.DishModel;
+import com.pragma.powerup.domain.model.OrderDishModel;
+import com.pragma.powerup.domain.model.OrderModel;
 import com.pragma.powerup.domain.model.RestaurantModel;
 import com.pragma.powerup.domain.spi.IDishPersistentPort;
+import com.pragma.powerup.domain.spi.IOrderPersistentPort;
 import com.pragma.powerup.domain.spi.IRestaurantPersistentPort;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +27,7 @@ import java.util.stream.Collectors;
 public class ClientUseCase implements IClientServicePort {
     private final IRestaurantPersistentPort restaurantPersistentPort;
     private final IDishPersistentPort dishPersistentPort;
+    private final IOrderPersistentPort orderPersistentPort;
 
     /**
      * List restaurants
@@ -73,5 +82,66 @@ public class ClientUseCase implements IClientServicePort {
             categories.add(category);
         });
         return categories;
+    }
+
+    /**
+     * Create a new order verifying first the client doesn't have one already in process
+     *
+     * @param dishesOrderData - dishes the client wants
+     * @param restaurantId - the restaurant the dishes belongs to
+     * @param clientEmail - client email
+     * @throws RestaurantDoesNotExistException - restaurant doesn't exists
+     * @throws ClientAlreadyHasOrderInProcessException - the client already has an order in process
+     * */
+    @Override
+    public List<OrderDishModel> newOrder(List<OrderDishModel> dishesOrderData,
+                                    Long restaurantId,
+                                    String clientEmail
+    ) {
+        if (dishesOrderData.isEmpty()) {
+            throw new DishesCannotBeEmptyException("Dishes cannot be empty");
+        }
+        Optional<RestaurantModel> restaurantModel = this.restaurantPersistentPort.getRestaurantById(restaurantId);
+        if (restaurantModel.isEmpty()) {
+            throw new RestaurantDoesNotExistException("Restaurant not found");
+        }
+        if (!this.orderPersistentPort.getInProcessOrdersByClientEmail(clientEmail).isEmpty()) {
+            throw new ClientAlreadyHasOrderInProcessException("Client already has an order in process");
+        }
+        OrderModel savedOrderModel = this.saveOrderModel(clientEmail,
+                new Date(), restaurantModel.get(), Constants.ORDER_PENDING_STATE);
+
+        for (OrderDishModel orderDishData: dishesOrderData) {
+            orderDishData.setOrderModel(savedOrderModel);
+            this.orderPersistentPort.saveOrderDish(orderDishData);
+        }
+        return dishesOrderData;
+    }
+
+    private OrderModel saveOrderModel(String clientEmail,
+                                      Date date,
+                                      RestaurantModel restaurantModel,
+                                      String state) {
+        OrderModel orderModel = new OrderModel();
+        orderModel.setClientEmail(clientEmail);
+        orderModel.setDate(date);
+        orderModel.setRestaurant(restaurantModel);
+        orderModel.setState(state);
+        return this.orderPersistentPort.saveOrder(orderModel);
+    }
+
+    /**
+     * Gets the dish model by its id and restaurant id
+     *
+     * @param dishId - dish id
+     * @throws DishDoesNotExistException the dish with the specified id doesn't exist
+     */
+    @Override
+    public DishModel getDishModelByIdAndRestaurantId(Long dishId, Long restaurantId) {
+        Optional<DishModel> dishModel = this.dishPersistentPort.getDishByIdAndRestaurantId(dishId, restaurantId);
+        if (dishModel.isEmpty()) {
+            throw new DishDoesNotExistException("Dish doesn't exist");
+        }
+        return dishModel.get();
     }
 }

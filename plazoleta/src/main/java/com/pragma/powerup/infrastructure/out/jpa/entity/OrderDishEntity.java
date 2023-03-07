@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Setter
 public class OrderDishEntity {
     @EmbeddedId
-    OrderDishEntityKey id;
+    OrderDishEntityKey id = new OrderDishEntityKey();
 
     @ManyToOne(optional = false)
     @MapsId("orderId")

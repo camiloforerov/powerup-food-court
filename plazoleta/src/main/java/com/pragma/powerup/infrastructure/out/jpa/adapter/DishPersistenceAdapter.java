@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -24,9 +25,9 @@ public class DishPersistenceAdapter implements IDishPersistentPort {
     }
 
     @Override
-    public DishModel getDishById(Long dishId) {
-        DishEntity dishEntity = this.dishRepository.findById(dishId).orElse(null);
-        return this.dishEntityMapper.toModel(dishEntity);
+    public Optional<DishModel> getDishByIdAndRestaurantId(Long dishId, Long restaurantId) {
+        DishEntity dishEntity = this.dishRepository.findByIdAndRestaurantId(dishId, restaurantId).orElse(null);
+        return Optional.ofNullable(this.dishEntityMapper.toModel(dishEntity));
     }
 
     @Override

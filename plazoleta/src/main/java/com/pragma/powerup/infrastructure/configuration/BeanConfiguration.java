@@ -14,14 +14,19 @@ import com.pragma.powerup.infrastructure.out.feign.mapper.ICreateEmployeeRespons
 import com.pragma.powerup.infrastructure.out.feign.mapper.IUserResponseMapper;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.CategoryPersistenceAdapter;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.DishPersistenceAdapter;
+import com.pragma.powerup.infrastructure.out.jpa.adapter.OrderPersistenceAdapter;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.RestaurantEmployeePersistenceAdapter;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.RestaurantPersistenceAdapter;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.ICategoryEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IDishEntityMapper;
+import com.pragma.powerup.infrastructure.out.jpa.mapper.IOrderDishEntityMapper;
+import com.pragma.powerup.infrastructure.out.jpa.mapper.IOrderEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IRestaurantEmployeeEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IRestaurantEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.ICategoryRepository;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IDishRepository;
+import com.pragma.powerup.infrastructure.out.jpa.repository.IOrderDishRepository;
+import com.pragma.powerup.infrastructure.out.jpa.repository.IOrderRepository;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IRestaurantEmployeeRepository;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IRestaurantRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +39,8 @@ public class BeanConfiguration {
     private final IRestaurantRepository restaurantRepository;
     private final IDishRepository dishRepository;
     private final ICategoryRepository categoryRepository;
+    private final IOrderRepository orderRepository;
+    private final IOrderDishRepository orderDishRepository;
     private final IRestaurantEmployeeRepository restaurantEmployeeRepository;
     private final IRestaurantEntityMapper restaurantEntityMapper;
     private final IDishEntityMapper dishEntityMapper;
@@ -42,6 +49,8 @@ public class BeanConfiguration {
     private final ICreateEmployeeResponseMapper createEmployeeResponseMapper;
     private final IUserResponseMapper userResponseMapper;
     private final IRestaurantEmployeeEntityMapper restaurantEmployeeEntityMapper;
+    private final IOrderEntityMapper orderEntityMapper;
+    private final IOrderDishEntityMapper orderDishEntityMapper;
     private final UserServiceFeignClient userServiceFeignClient;
 
     @Bean
@@ -52,6 +61,10 @@ public class BeanConfiguration {
     @Bean
     public IDishPersistentPort dishPersistentPort() {
         return new DishPersistenceAdapter(dishRepository, dishEntityMapper);
+    }
+
+    public IOrderPersistentPort orderPersistentPort() {
+        return new OrderPersistenceAdapter(orderRepository, orderDishRepository, orderEntityMapper, orderDishEntityMapper);
     }
 
     @Bean
@@ -83,7 +96,7 @@ public class BeanConfiguration {
 
     @Bean
     public IClientServicePort clientServicePort() {
-        return new ClientUseCase(this.restaurantPersistentPort(), this.dishPersistentPort());
+        return new ClientUseCase(this.restaurantPersistentPort(), this.dishPersistentPort(), this.orderPersistentPort());
     }
 
     @Bean

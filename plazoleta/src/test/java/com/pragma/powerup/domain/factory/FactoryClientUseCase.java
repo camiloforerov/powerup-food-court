@@ -2,7 +2,11 @@ package com.pragma.powerup.domain.factory;
 
 import com.pragma.powerup.domain.model.CategoryModel;
 import com.pragma.powerup.domain.model.DishModel;
+import com.pragma.powerup.domain.model.OrderDishModel;
+import com.pragma.powerup.domain.model.OrderModel;
 import com.pragma.powerup.domain.model.RestaurantModel;
+
+import java.util.Date;
 
 public class FactoryClientUseCase {
     public static RestaurantModel getRestaurantModel() {
@@ -32,5 +36,18 @@ public class FactoryClientUseCase {
         categoryModel.setName("Italian");
         categoryModel.setDescription("Italian food");
         return categoryModel;
+    }
+
+    public static OrderDishModel getOrderDishModelWithDish(DishModel dishModel) {
+        OrderDishModel orderDishModel = new OrderDishModel();
+        orderDishModel.setDishModel(dishModel);
+        orderDishModel.setAmount(2);
+        return orderDishModel;
+    }
+
+    public static OrderModel getOrderModel() {
+        OrderModel orderModel = new OrderModel();
+        orderModel.setDate(new Date());
+        return orderModel;
     }
 }
