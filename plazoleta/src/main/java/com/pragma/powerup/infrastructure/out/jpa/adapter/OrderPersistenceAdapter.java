@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -52,6 +53,12 @@ public class OrderPersistenceAdapter implements IOrderPersistentPort {
     }
 
     @Override
+    public OrderWithDishesModel saveOrderToOrderWithDishes(OrderModel orderModel) {
+        OrderEntity orderEntity = this.orderEntityMapper.toEntity(orderModel);
+        return this.orderEntityMapper.toOrderWithDishesModel(this.orderRepository.save(orderEntity));
+    }
+
+    @Override
     public List<OrderWithDishesModel> getOrdersByRestaurantIdAndState(Long restaurantId,
                                                                       int page,
                                                                       int elementsPerPage,
@@ -84,5 +91,11 @@ public class OrderPersistenceAdapter implements IOrderPersistentPort {
         return ordersEntity.stream()
                 .map(orderEntityMapper::toOrderWithDishesModel)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<OrderModel> getOrderByRestaurantIdAndOrderId(Long restaurantId, Long orderId) {
+        OrderEntity orderEntity = this.orderRepository.findByRestaurantIdAndId(restaurantId, orderId).orElse(null);
+        return Optional.ofNullable(this.orderEntityMapper.toModel(orderEntity));
     }
 }

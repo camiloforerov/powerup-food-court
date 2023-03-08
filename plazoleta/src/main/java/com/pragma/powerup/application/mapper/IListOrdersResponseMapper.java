@@ -17,6 +17,7 @@ public interface IListOrdersResponseMapper {
     @Mapping(target = "date", source = "orderWithDishesModel.date")
     @Mapping(target = "clientEmail", source = "orderWithDishesModel.clientEmail")
     @Mapping(target = "state", source = "orderWithDishesModel.state")
+    @Mapping(target = "chefEmail", source = "orderWithDishesModel.chefEmail")
     @Mapping(target = "orderDishes", source = "orderWithDishesModel.orderDishes", qualifiedByName = { "toDishResponseDto" })
     OrderResponseDto toDto(OrderWithDishesModel orderWithDishesModel);
 

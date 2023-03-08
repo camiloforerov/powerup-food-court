@@ -17,6 +17,7 @@ public class OrderWithDishesModel {
     private Date date;
     private String clientEmail;
     private String state;
+    private String chefEmail;
     private List<OrderDishModel> orderDishes;
 
 }

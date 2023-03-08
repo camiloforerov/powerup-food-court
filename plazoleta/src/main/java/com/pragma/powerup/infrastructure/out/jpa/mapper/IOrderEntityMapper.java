@@ -13,7 +13,7 @@ import org.mapstruct.ReportingPolicy;
 
 @Named("orderEntityMapper")
 @Mapper(componentModel = "spring",
-        uses = { IRestaurantEntityMapper.class, IDishEntityMapper.class },
+        uses = { IRestaurantEntityMapper.class, IDishEntityMapper.class, IRestaurantEmployeeEntityMapper.class },
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         unmappedSourcePolicy = ReportingPolicy.IGNORE
 )
@@ -23,7 +23,7 @@ public interface IOrderEntityMapper {
     @Mapping(target = "date", source = "orderEntity.date")
     @Mapping(target = "clientEmail", source = "orderEntity.clientEmail")
     @Mapping(target = "restaurant", qualifiedByName = {"restaurantEntityMapper", "toModelNoDishes"})
-    @Mapping(target = "chef", source = "orderEntity.restaurantEmployee")
+    @Mapping(target = "chef", source = "orderEntity.restaurantEmployee", qualifiedByName = {"restaurantEmployeeEntityMapper", "toModel"})
     @Mapping(target = "state", source = "orderEntity.state", qualifiedByName = "stateEnumToString")
     OrderModel toModel(OrderEntity orderEntity);
 
@@ -40,6 +40,7 @@ public interface IOrderEntityMapper {
     @Mapping(target = "date", source = "orderEntity.date")
     @Mapping(target = "clientEmail", source = "orderEntity.clientEmail")
     @Mapping(target = "state", source = "orderEntity.state", qualifiedByName = "stateEnumToString")
+    @Mapping(target = "chefEmail", source = "orderEntity.restaurantEmployee.userEmail")
     @Mapping(target = "orderDishes", source = "orderEntity.orderDishes", qualifiedByName = {"toOrderDishModel"})
     OrderWithDishesModel toOrderWithDishesModel(OrderEntity orderEntity);
 

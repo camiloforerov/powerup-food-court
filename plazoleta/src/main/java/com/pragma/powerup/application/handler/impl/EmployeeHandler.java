@@ -1,17 +1,25 @@
 package com.pragma.powerup.application.handler.impl;
 
+import com.pragma.powerup.application.dto.response.AssignOrderResponseDto;
 import com.pragma.powerup.application.dto.response.OrderResponseDto;
+import com.pragma.powerup.application.exception.exception.BadRequestException;
+import com.pragma.powerup.application.exception.exception.NoDataFoundException;
 import com.pragma.powerup.application.exception.exception.ServerErrorException;
 import com.pragma.powerup.application.handler.IEmployeeHandler;
+import com.pragma.powerup.application.mapper.IAssignOrderResponseMapper;
 import com.pragma.powerup.application.mapper.IListOrdersResponseMapper;
 import com.pragma.powerup.domain.api.IEmployeeServicePort;
 import com.pragma.powerup.domain.exceptions.EmployeeDoesNotBelongToAnyRestaurantException;
+import com.pragma.powerup.domain.exceptions.OrderDoesNotExistException;
+import com.pragma.powerup.domain.exceptions.OrderIsAlreadyAssignedToChefException;
+import com.pragma.powerup.domain.model.OrderModel;
 import com.pragma.powerup.domain.model.OrderWithDishesModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +29,7 @@ import java.util.stream.Collectors;
 public class EmployeeHandler implements IEmployeeHandler {
     private final IEmployeeServicePort employeeServicePort;
     private final IListOrdersResponseMapper listOrdersResponseMapper;
+    private final IAssignOrderResponseMapper assignOrderResponseMapper;
 
     /**
      * Lists orders by state
@@ -32,16 +41,47 @@ public class EmployeeHandler implements IEmployeeHandler {
      * */
     @Override
     public List<OrderResponseDto> listOrdersByState(String orderState, int page, int elementsPerPage) {
-        String ownerEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        String employeeEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         List<OrderWithDishesModel> orders;
         try {
-             orders = this.employeeServicePort.listOrdersByState(orderState, page, elementsPerPage, ownerEmail);
+             orders = this.employeeServicePort.listOrdersByState(orderState, page, elementsPerPage, employeeEmail);
         } catch (EmployeeDoesNotBelongToAnyRestaurantException ex) {
             throw new ServerErrorException(ex.getMessage());
         }
 
         return orders.stream()
                 .map(listOrdersResponseMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Assign multiple orders to an employee
+     *
+     * @param ordersId - list of ids corresponding to orders
+     * @return list of assigned orders
+     * @throws ServerErrorException - employee is not related to any restaurant
+     * @throws NoDataFoundException - some order doesn't exist
+     * @throws BadRequestException - the orders is already taken or not in the correct state
+     *
+     * */
+    @Override
+    public List<AssignOrderResponseDto> assignOrdersToEmployee(List<Long> ordersId) {
+        String employeeEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<OrderWithDishesModel> modifiedOrders = new ArrayList<>();
+        for (Long orderId: ordersId) {
+            try {
+                OrderWithDishesModel orderModel = this.employeeServicePort.assignOrder(employeeEmail, orderId);
+                modifiedOrders.add(orderModel);
+            } catch (EmployeeDoesNotBelongToAnyRestaurantException ex) {
+                throw new ServerErrorException(ex.getMessage());
+            } catch (OrderDoesNotExistException ex) {
+                throw new NoDataFoundException(ex.getMessage());
+            } catch (OrderIsAlreadyAssignedToChefException ex) {
+                throw new BadRequestException(ex.getMessage());
+            }
+        }
+        return modifiedOrders.stream()
+                .map(assignOrderResponseMapper::toDto)
                 .collect(Collectors.toList());
     }
 }
