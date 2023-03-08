@@ -3,7 +3,6 @@ package com.pragma.powerup.infrastructure.input.rest;
 import com.pragma.powerup.application.dto.request.NewOrderDishRequestDto;
 import com.pragma.powerup.application.dto.response.CategorizedDishResponseDto;
 import com.pragma.powerup.application.dto.response.DishOrderResponseDto;
-import com.pragma.powerup.application.dto.response.NewOrderDishResponseDto;
 import com.pragma.powerup.application.dto.response.RestaurantForClientResponseDto;
 import com.pragma.powerup.application.handler.IClientHandler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;

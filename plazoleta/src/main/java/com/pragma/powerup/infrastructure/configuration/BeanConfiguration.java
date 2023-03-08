@@ -2,10 +2,12 @@ package com.pragma.powerup.infrastructure.configuration;
 
 import com.pragma.powerup.domain.api.IAdminServicePort;
 import com.pragma.powerup.domain.api.IClientServicePort;
+import com.pragma.powerup.domain.api.IEmployeeServicePort;
 import com.pragma.powerup.domain.api.IOwnerServicePort;
 import com.pragma.powerup.domain.spi.*;
 import com.pragma.powerup.domain.usecase.AdminUseCase;
 import com.pragma.powerup.domain.usecase.ClientUseCase;
+import com.pragma.powerup.domain.usecase.EmployeeUseCase;
 import com.pragma.powerup.domain.usecase.OwnerUseCase;
 import com.pragma.powerup.infrastructure.out.feign.UserServiceFeignClient;
 import com.pragma.powerup.infrastructure.out.feign.adapter.UserServiceAdapter;
@@ -102,5 +104,10 @@ public class BeanConfiguration {
     @Bean
     public IAdminServicePort adminServicePort() {
         return new AdminUseCase(this.restaurantPersistentPort(), this.userServicePort());
+    }
+
+    @Bean
+    public IEmployeeServicePort employeeServicePort() {
+        return new EmployeeUseCase(this.orderPersistentPort(), this.restaurantEmployeePersistentPort());
     }
 }
