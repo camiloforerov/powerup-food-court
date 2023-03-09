@@ -12,7 +12,6 @@ import com.pragma.powerup.domain.api.IEmployeeServicePort;
 import com.pragma.powerup.domain.exceptions.EmployeeDoesNotBelongToAnyRestaurantException;
 import com.pragma.powerup.domain.exceptions.OrderDoesNotExistException;
 import com.pragma.powerup.domain.exceptions.OrderIsAlreadyAssignedToChefException;
-import com.pragma.powerup.domain.model.OrderModel;
 import com.pragma.powerup.domain.model.OrderWithDishesModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;

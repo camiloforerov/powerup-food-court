@@ -22,6 +22,8 @@ public class CreateRestaurantRequestDto {
             message = "Phone number must be between 7 and 13 characters")
     @NotBlank(message = "Phone number cannot be blank")
     private String phone;
+    @NotBlank(message = "Url logo cannot be blank")
+    private String urlLogo;
     @NotNull(message = "Nit cannot be blank")
     private Long nit;
 }

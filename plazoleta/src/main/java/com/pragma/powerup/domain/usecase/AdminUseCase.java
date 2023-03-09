@@ -19,6 +19,7 @@ public class AdminUseCase implements IAdminServicePort {
      *
      * @param restaurantModel - restaurant information
      * @throws UserDoesNotExistException - restaurant owner doesn't exist
+     * @throws OwnerAlreadyHasRestaurantException - owner already exists
      * */
     @Override
     public void createRestaurant(RestaurantModel restaurantModel) {

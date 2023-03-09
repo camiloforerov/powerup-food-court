@@ -51,11 +51,11 @@ public class CreateEmployeeUseCaseTest {
         // When
         when(restaurantPersistentPort.getRestaurantById(restaurantModel.getId()))
                 .thenReturn(Optional.of(restaurantModel));
-        when(userServicePort.createEmployee(userModel, 1L)).thenReturn(userModel);
+        when(userServicePort.createEmployee(userModel)).thenReturn(userModel);
         when(restaurantEmployeePersistentPort.save(any())).thenReturn(restaurantEmployeeModel);
         // Then
 
-        ownerUseCase.createEmployee(userModel, 1L, restaurantModel.getId());
+        ownerUseCase.createEmployee(userModel, restaurantModel.getId());
         verify(restaurantEmployeePersistentPort).save(any(RestaurantEmployeeModel.class));
     }
 
@@ -66,7 +66,7 @@ public class CreateEmployeeUseCaseTest {
         Assertions.assertThrows(
                 RestaurantDoesNotExistException.class,
                 () -> {
-                    ownerUseCase.createEmployee(FactoryOwnerUseCase.getEmployeeUserModel(), anyLong(), 1L);
+                    ownerUseCase.createEmployee(FactoryOwnerUseCase.getEmployeeUserModel(), anyLong());
                 }
         );
     }

@@ -97,16 +97,15 @@ public class OwnerUseCase implements IOwnerServicePort {
      * Creates an employee
      *
      * @param  userModel - employee information
-     * @param roleId - employee id role
      * @param restaurantId - restaurant to be linked with the employee
      * */
     @Override
-    public RestaurantEmployeeModel createEmployee(UserModel userModel, Long roleId, Long restaurantId) {
+    public RestaurantEmployeeModel createEmployee(UserModel userModel, Long restaurantId) {
         Optional<RestaurantModel> restaurantModel = this.restaurantPersistentPort.getRestaurantById(restaurantId);
         if (restaurantModel.isEmpty()) {
             throw new RestaurantDoesNotExistException("Restaurant not found");
         }
-        UserModel createdUserModel = this.userServicePort.createEmployee(userModel, roleId);
+        UserModel createdUserModel = this.userServicePort.createEmployee(userModel);
 
         return this.restaurantEmployeePersistentPort.save(new RestaurantEmployeeModel(
                 createdUserModel.getEmail(), restaurantModel.get())

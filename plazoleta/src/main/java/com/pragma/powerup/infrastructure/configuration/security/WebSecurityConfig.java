@@ -7,6 +7,7 @@ import com.pragma.powerup.infrastructure.configuration.security.userdetails.Cust
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -35,6 +36,7 @@ public class WebSecurityConfig {
                 //.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
+                .antMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .antMatchers("/food-court/v1/owner/**").hasRole("OWNER")
                 .antMatchers("/food-court/v1/admin/**").hasRole("ADMIN")
                 .antMatchers("/food-court/v1/client/**").hasRole("CLIENT")

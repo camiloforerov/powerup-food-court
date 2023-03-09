@@ -15,5 +15,6 @@ public interface ICreateRestaurantRequestMapper {
     @Mapping(target = "ownerEmail", source = "createRestaurantRequestDto.ownerEmail")
     @Mapping(target = "phone", source = "createRestaurantRequestDto.phone")
     @Mapping(target = "nit", source = "createRestaurantRequestDto.nit")
+    @Mapping(target = "urlLogo", source = "createRestaurantRequestDto.urlLogo")
     RestaurantModel toModel(CreateRestaurantRequestDto createRestaurantRequestDto);
 }

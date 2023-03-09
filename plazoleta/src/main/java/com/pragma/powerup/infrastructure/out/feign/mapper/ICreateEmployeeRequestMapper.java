@@ -17,7 +17,6 @@ public interface ICreateEmployeeRequestMapper {
     @Mapping(target = "phone", source = "userModel.phone")
     @Mapping(target = "email", source = "userModel.email")
     @Mapping(target = "password", source = "userModel.password")
-    @Mapping(target = "roleId", source = "roleId")
-    CreateEmployeeRequestDto toDto(UserModel userModel, Long roleId);
+    CreateEmployeeRequestDto toDto(UserModel userModel);
 
 }

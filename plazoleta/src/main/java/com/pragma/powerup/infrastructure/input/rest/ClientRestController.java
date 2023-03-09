@@ -40,6 +40,7 @@ public class ClientRestController {
     @Operation(summary = "Find all dishes for a specific restaurant")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of dishes categorized returned", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Restaurant not found", content = @Content),
     })
     @GetMapping("/dishes-restaurant")
     public ResponseEntity<List<CategorizedDishResponseDto>> getDishesListPerRestaurant(

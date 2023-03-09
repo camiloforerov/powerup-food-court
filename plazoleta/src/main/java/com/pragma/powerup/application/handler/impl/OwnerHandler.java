@@ -8,12 +8,14 @@ import com.pragma.powerup.application.dto.response.CreatedDishResponseDto;
 import com.pragma.powerup.application.dto.response.RestaurantEmployeeResponseDto;
 import com.pragma.powerup.application.dto.response.UpdatedDishResponseDto;
 import com.pragma.powerup.application.exception.exception.NoDataFoundException;
+import com.pragma.powerup.application.exception.exception.ServerErrorException;
 import com.pragma.powerup.application.handler.IOwnerHandler;
 import com.pragma.powerup.application.mapper.ICreateDishRequestMapper;
 import com.pragma.powerup.application.mapper.ICreateEmployeeMapper;
 import com.pragma.powerup.application.mapper.ICreatedDishResponseMapper;
 import com.pragma.powerup.application.mapper.IUpdateDishMapper;
 import com.pragma.powerup.domain.api.IOwnerServicePort;
+import com.pragma.powerup.domain.exceptions.CategoryDoesNotExistException;
 import com.pragma.powerup.domain.exceptions.DishDoesNotExistException;
 import com.pragma.powerup.domain.exceptions.NoRestaurantForOwnerFoundException;
 import com.pragma.powerup.domain.model.DishModel;
@@ -52,11 +54,16 @@ public class OwnerHandler implements IOwnerHandler {
             throw new NoDataFoundException(ex.getMessage());
         }
 
-        DishModel createdDish = this.ownerServicePort.createDish(
-                this.createDishRequestMapper.toModel(createDishDto),
-                restaurantModel,
-                createDishDto.getCategoryId());
-        return this.createdDishResponseMapper.toResponse(createdDish);
+        try {
+            DishModel createdDish = this.ownerServicePort.createDish(
+                    this.createDishRequestMapper.toModel(createDishDto),
+                    restaurantModel,
+                    createDishDto.getCategoryId());
+
+            return this.createdDishResponseMapper.toResponse(createdDish);
+        } catch (CategoryDoesNotExistException ex) {
+            throw new NoDataFoundException(ex.getMessage());
+        }
     }
 
     /**
@@ -83,7 +90,7 @@ public class OwnerHandler implements IOwnerHandler {
      * the employee relationship
      *
      * @param createEmployeeRequestDto - employee information
-     * @throws NoDataFoundException - couldn't find the restaurant
+     * @throws ServerErrorException - couldn't find the restaurant
      * @return employee email and related restaurant id
      * */
     @Override
@@ -93,11 +100,10 @@ public class OwnerHandler implements IOwnerHandler {
         try {
             restaurantModel = this.ownerServicePort.getRestaurantByOwnerEmail(ownerEmail);
         } catch (NoRestaurantForOwnerFoundException ex) {
-            throw new NoDataFoundException(ex.getMessage());
+            throw new ServerErrorException(ex.getMessage());
         }
         UserModel userModel = this.createEmployeeRequestMapper.toUserModel(createEmployeeRequestDto);
         RestaurantEmployeeModel restaurantEmployeeModel = this.ownerServicePort.createEmployee(userModel,
-                createEmployeeRequestDto.getRoleId(),
                 restaurantModel.getId()
         );
         return this.createEmployeeRequestMapper.toRestaurantEmployee(restaurantEmployeeModel);
@@ -107,6 +113,7 @@ public class OwnerHandler implements IOwnerHandler {
      * Updates dish state
      *
      * @param updateDishRequestDto - dish id and new state
+     * @throws NoDataFoundException - dish or restaurant not found
      * */
     @Override
     public UpdatedDishResponseDto updateDishState(UpdateDishStateRequestDto updateDishRequestDto) {
@@ -119,9 +126,11 @@ public class OwnerHandler implements IOwnerHandler {
                     updateDishRequestDto.getNewState(),
                     userEmail
             );
-        } catch (DishDoesNotExistException | NoRestaurantForOwnerFoundException ex) {
+        } catch (DishDoesNotExistException ex) {
             throw new NoDataFoundException(ex.getMessage());
-        }
-        return this.updateDishMapper.toDto(dishModel);
+        } catch (NoRestaurantForOwnerFoundException ex) {
+            throw new ServerErrorException(ex.getMessage());
+
+        }        return this.updateDishMapper.toDto(dishModel);
     }
 }

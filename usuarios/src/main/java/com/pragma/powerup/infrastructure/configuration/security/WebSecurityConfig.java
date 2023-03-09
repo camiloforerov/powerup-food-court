@@ -7,6 +7,7 @@ import com.pragma.powerup.infrastructure.configuration.security.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -44,6 +45,7 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/users/v1/auth/login").permitAll()
                 .antMatchers("/users/v1/auth/client").permitAll()
+                .antMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .antMatchers("/users/v1/admin/**").hasRole("ADMIN")
                 .antMatchers("/users/v1/owner/**").hasRole("OWNER")
                 .anyRequest()

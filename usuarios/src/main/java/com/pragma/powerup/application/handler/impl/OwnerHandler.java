@@ -39,8 +39,8 @@ public class OwnerHandler implements IOwnerHandler {
              createdUserModel = this.ownerServicePort.createEmployee(userModel);
         } catch (EmailAlreadyExistsException ex) {
             throw new DataAlreadyExistsException(ex.getMessage());
-        } catch (NoDataFoundException ex) {
-            throw new RoleNotFoundException(ex.getMessage());
+        } catch (RoleNotFoundException ex) {
+            throw new NoDataFoundException(ex.getMessage());
         }
 
         return this.createEmployeeResponseMapper.toDto(createdUserModel);

@@ -98,18 +98,23 @@ public class ClientHandler implements IClientHandler {
                 orderDishesModels.add(orderDishModel);
             } catch (DishDoesNotExistException ex ) {
                 throw new NoDataFoundException(ex.getMessage());
-            } catch (ClientAlreadyHasOrderInProcessException ex) {
-                throw new DataAlreadyExistsException(ex.getMessage());
-            } catch (DishesCannotBeEmptyException ex) {
-                throw new BadRequestException(ex.getMessage());
             }
         }
 
-        List<OrderDishModel> orderDishModels = this.clientServicePort
-                .newOrder(orderDishesModels, newOrderDishRequestDto.getRestaurantId(), clientEmail);
+        try {
+            List<OrderDishModel> orderDishModels = this.clientServicePort
+                    .newOrder(orderDishesModels, newOrderDishRequestDto.getRestaurantId(), clientEmail);
 
-        return orderDishModels.stream()
-                .map(this.newOrderResponseMapper::toDto)
-                .collect(Collectors.toList());
+            return orderDishModels.stream()
+                    .map(this.newOrderResponseMapper::toDto)
+                    .collect(Collectors.toList());
+        } catch (ClientAlreadyHasOrderInProcessException ex) {
+            throw new DataAlreadyExistsException(ex.getMessage());
+        } catch (DishesCannotBeEmptyException ex) {
+            throw new BadRequestException(ex.getMessage());
+        } catch (RestaurantDoesNotExistException ex) {
+            throw new NoDataFoundException(ex.getMessage());
+        }
+
     }
 }

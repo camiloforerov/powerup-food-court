@@ -4,7 +4,6 @@ import com.pragma.powerup.domain.model.userservice.UserModel;
 import com.pragma.powerup.domain.spi.IUserServicePort;
 import com.pragma.powerup.infrastructure.out.feign.UserServiceFeignClient;
 import com.pragma.powerup.infrastructure.out.feign.dto.request.CreateEmployeeRequestDto;
-import com.pragma.powerup.infrastructure.out.feign.dto.response.CreateEmployeeResponseDto;
 import com.pragma.powerup.infrastructure.out.feign.dto.response.RestaurantOwnerResponseDto;
 import com.pragma.powerup.infrastructure.out.feign.dto.response.UserResponseDto;
 import com.pragma.powerup.infrastructure.out.feign.mapper.ICreateEmployeeRequestMapper;
@@ -49,11 +48,10 @@ public class UserServiceAdapter implements IUserServicePort {
      * Calls user service to create employee's user entity
      *
      * @param userModel - employee information
-     * @param roleId - employee role id
      * */
     @Override
-    public UserModel createEmployee(UserModel userModel, Long roleId) {
-        CreateEmployeeRequestDto createEmployeeRequestDto = this.createEmployeeRequestMapper.toDto(userModel, roleId);
+    public UserModel createEmployee(UserModel userModel) {
+        CreateEmployeeRequestDto createEmployeeRequestDto = this.createEmployeeRequestMapper.toDto(userModel);
         return this.createEmployeeResponseMapper.toModel(this.userServiceFeignClient.createEmployee(createEmployeeRequestDto));
     }
 }

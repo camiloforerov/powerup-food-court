@@ -27,8 +27,10 @@ public class OwnerRestController {
     private final IOwnerHandler ownerHandler;
 
     @Operation(summary = "Creates a new dish")
-    @ApiResponses(
-            @ApiResponse(responseCode = "201", description = "Dish created", content = @Content)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Dish created", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Category not found", content = @Content)
+        }
     )
     @PostMapping("/dish")
     public ResponseEntity<CreatedDishResponseDto> createDish(
@@ -48,8 +50,11 @@ public class OwnerRestController {
     }
 
     @Operation(summary = "Creates a new employee")
-    @ApiResponses(
-            @ApiResponse(responseCode = "201", description = "Employee created", content = @Content)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Employee created", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Employee already exists", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Owner restaurant couldn't be found", content = @Content)
+        }
     )
     @PostMapping("/employee")
     public ResponseEntity<RestaurantEmployeeResponseDto> createEmployee(
@@ -60,7 +65,8 @@ public class OwnerRestController {
     @Operation(summary = "Change state of a dish")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "State changed", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Dish couldn't be found", content = @Content)
+            @ApiResponse(responseCode = "404", description = "Dish couldn't be found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Owner restaurant couldn't be found", content = @Content)
     })
     @PutMapping("/dish-state")
     public ResponseEntity<UpdatedDishResponseDto> changeDishState(

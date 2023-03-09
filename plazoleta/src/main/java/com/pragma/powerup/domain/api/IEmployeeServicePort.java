@@ -1,6 +1,5 @@
 package com.pragma.powerup.domain.api;
 
-import com.pragma.powerup.domain.model.OrderModel;
 import com.pragma.powerup.domain.model.OrderWithDishesModel;
 
 import java.util.List;

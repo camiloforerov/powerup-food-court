@@ -34,7 +34,6 @@ public class EmployeeRestController {
     public ResponseEntity<List<OrderResponseDto>> listRestaurants(
             @Valid @RequestBody ListOrdersRequestDto listOrdersRequestDto
     ) {
-
         return ResponseEntity.ok(this.employeeHandler.listOrdersByState(listOrdersRequestDto.getOrderState(),
                 listOrdersRequestDto.getPage(), listOrdersRequestDto.getElementsPerPage()));
     }

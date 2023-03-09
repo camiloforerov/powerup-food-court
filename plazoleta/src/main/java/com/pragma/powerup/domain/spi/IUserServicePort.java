@@ -4,6 +4,6 @@ import com.pragma.powerup.domain.model.userservice.UserModel;
 
 public interface IUserServicePort {
     boolean userIsRestaurantOwner(String email);
-    UserModel createEmployee(UserModel userModel, Long roleId);
+    UserModel createEmployee(UserModel userModel);
     UserModel getUserByEmail(String email);
 }
