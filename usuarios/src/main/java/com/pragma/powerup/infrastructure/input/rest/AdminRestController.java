@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -43,5 +42,10 @@ public class AdminRestController {
     @GetMapping("/restaurant-owner")
     public ResponseEntity<RestaurantOwnerResponseDto> getOwnerUser(@RequestParam("email") String email) {
         return new ResponseEntity<>(this.userHandler.getRestaurantOwner(email), HttpStatus.OK);
+    }
+
+    @GetMapping("/try")
+    public ResponseEntity<Void> trying() {
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

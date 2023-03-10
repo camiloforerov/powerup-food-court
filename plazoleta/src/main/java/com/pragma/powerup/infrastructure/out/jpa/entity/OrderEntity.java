@@ -39,6 +39,9 @@ public class OrderEntity {
     @Column(name = "email_cliente", nullable = false)
     private String clientEmail;
 
+    @Column(name = "pin_seguridad")
+    private String securityPin;
+
     @OneToMany(mappedBy = "order")
     private List<OrderDishEntity> orderDishes;
 

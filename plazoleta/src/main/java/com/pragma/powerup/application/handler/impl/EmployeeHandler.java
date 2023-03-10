@@ -12,6 +12,7 @@ import com.pragma.powerup.domain.api.IEmployeeServicePort;
 import com.pragma.powerup.domain.exceptions.EmployeeDoesNotBelongToAnyRestaurantException;
 import com.pragma.powerup.domain.exceptions.OrderDoesNotExistException;
 import com.pragma.powerup.domain.exceptions.OrderIsAlreadyAssignedToChefException;
+import com.pragma.powerup.domain.model.OrderModel;
 import com.pragma.powerup.domain.model.OrderWithDishesModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,17 +34,17 @@ public class EmployeeHandler implements IEmployeeHandler {
     /**
      * Lists orders by state
      *
-     * @param orderState - order state to filter
-     * @param page - page number to show. For pagination
+     * @param orderState      - order state to filter
+     * @param page            - page number to show. For pagination
      * @param elementsPerPage - elements to show per page. For pagination
      * @return list of orders with its dishes
-     * */
+     */
     @Override
     public List<OrderResponseDto> listOrdersByState(String orderState, int page, int elementsPerPage) {
         String employeeEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         List<OrderWithDishesModel> orders;
         try {
-             orders = this.employeeServicePort.listOrdersByState(orderState, page, elementsPerPage, employeeEmail);
+            orders = this.employeeServicePort.listOrdersByState(orderState, page, elementsPerPage, employeeEmail);
         } catch (EmployeeDoesNotBelongToAnyRestaurantException ex) {
             throw new ServerErrorException(ex.getMessage());
         }
@@ -60,14 +61,13 @@ public class EmployeeHandler implements IEmployeeHandler {
      * @return list of assigned orders
      * @throws ServerErrorException - employee is not related to any restaurant
      * @throws NoDataFoundException - some order doesn't exist
-     * @throws BadRequestException - the orders is already taken or not in the correct state
-     *
-     * */
+     * @throws BadRequestException  - the orders is already taken or not in the correct state
+     */
     @Override
     public List<AssignOrderResponseDto> assignOrdersToEmployee(List<Long> ordersId) {
         String employeeEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         List<OrderWithDishesModel> modifiedOrders = new ArrayList<>();
-        for (Long orderId: ordersId) {
+        for (Long orderId : ordersId) {
             try {
                 OrderWithDishesModel orderModel = this.employeeServicePort.assignOrder(employeeEmail, orderId);
                 modifiedOrders.add(orderModel);
@@ -82,5 +82,12 @@ public class EmployeeHandler implements IEmployeeHandler {
         return modifiedOrders.stream()
                 .map(assignOrderResponseMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    //ToDo... comments
+    @Override
+    public void changeOrderToReady(Long orderId) {
+        String employeeEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        this.employeeServicePort.changeOrderToReady(orderId, employeeEmail);
     }
 }

@@ -28,6 +28,7 @@ ext {
 	openApiVersion = "1.6.11"
 	springBootSecurityVersion = "2.7.3"
 	jsonwebtokenVersion = "0.9.1"
+	springSecurityTestVersion = "5.8.0"
 }
 
 dependencies {
@@ -37,6 +38,7 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
 	developmentOnly "org.springframework.boot:spring-boot-devtools:${springBootVersion}"
 	testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+	testImplementation "org.springframework.security:spring-security-test:${springSecurityTestVersion}"
 
 	runtimeOnly "mysql:mysql-connector-java:${mySqlConnectorVersion}"
 

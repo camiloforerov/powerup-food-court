@@ -8,4 +8,5 @@ import java.util.List;
 public interface IEmployeeHandler {
     List<OrderResponseDto> listOrdersByState(String orderState, int page, int elementsPerPage);
     List<AssignOrderResponseDto> assignOrdersToEmployee(List<Long> ordersId);
+    void changeOrderToReady(Long orderId);
 }

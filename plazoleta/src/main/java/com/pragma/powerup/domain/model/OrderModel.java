@@ -16,6 +16,7 @@ public class OrderModel {
     private Date date;
     private String clientEmail;
     private String state;
+    private String securityPin;
     private RestaurantModel restaurant;
     private RestaurantEmployeeModel chef;
 }

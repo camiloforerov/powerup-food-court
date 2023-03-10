@@ -64,6 +64,34 @@ public class OrderPersistenceAdapter implements IOrderPersistentPort {
                                                                       int elementsPerPage,
                                                                       String state
     ) {
+        OrderStateType orderStateType = this.convertStringToOrderStateType(state);
+        PageRequest pageable = PageRequest.of(
+                page,
+                elementsPerPage
+        );
+        List<OrderEntity> ordersEntity = this.orderRepository.findByRestaurantIdAndState(restaurantId,
+                orderStateType, pageable);
+        return ordersEntity.stream()
+                .map(orderEntityMapper::toOrderWithDishesModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<OrderModel> getOrderByRestaurantIdAndOrderId(Long restaurantId, Long orderId) {
+        OrderEntity orderEntity = this.orderRepository.findByRestaurantIdAndId(restaurantId, orderId).orElse(null);
+        return Optional.ofNullable(this.orderEntityMapper.toModel(orderEntity));
+    }
+
+    @Override
+    public List<OrderModel> getOrdersReadyBySecurityCode(String securityPin) {
+        List<OrderEntity> ordersEntity = this.orderRepository.findBySecurityPinAndState(securityPin,
+                OrderStateType.LISTO);
+        return ordersEntity.stream()
+                .map(this.orderEntityMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    private OrderStateType convertStringToOrderStateType(String state) {
         OrderStateType stateToProcess;
         switch (state) {
             case Constants.ORDER_PENDING_STATE:
@@ -82,20 +110,6 @@ public class OrderPersistenceAdapter implements IOrderPersistentPort {
                 stateToProcess = OrderStateType.EN_PREPARACION;
                 break;
         }
-        PageRequest pageable = PageRequest.of(
-                page,
-                elementsPerPage
-        );
-        List<OrderEntity> ordersEntity = this.orderRepository.findByRestaurantIdAndState(restaurantId,
-                stateToProcess, pageable);
-        return ordersEntity.stream()
-                .map(orderEntityMapper::toOrderWithDishesModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Optional<OrderModel> getOrderByRestaurantIdAndOrderId(Long restaurantId, Long orderId) {
-        OrderEntity orderEntity = this.orderRepository.findByRestaurantIdAndId(restaurantId, orderId).orElse(null);
-        return Optional.ofNullable(this.orderEntityMapper.toModel(orderEntity));
+        return stateToProcess;
     }
 }
