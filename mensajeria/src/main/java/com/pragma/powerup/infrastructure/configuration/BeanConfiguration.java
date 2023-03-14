@@ -1,13 +1,22 @@
 package com.pragma.powerup.infrastructure.configuration;
 
-import com.pragma.powerup.domain.api.IObjectServicePort;
-import lombok.RequiredArgsConstructor;
+import com.pragma.powerup.domain.api.INotificationServicePort;
+import com.pragma.powerup.domain.spi.IMessageNotificationPort;
+import com.pragma.powerup.domain.usecase.NotificationUseCase;
+import com.pragma.powerup.infrastructure.out.twilio.adapter.TwilioMessageNotificationAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@RequiredArgsConstructor
 public class BeanConfiguration {
-    //private final IObjectRepository objectRepository;
-    //private final IObjectEntityMapper objectEntityMapper;
+
+    @Bean
+    public IMessageNotificationPort messageNotificationPort() {
+        return new TwilioMessageNotificationAdapter();
+    }
+
+    @Bean
+    public INotificationServicePort notificationServicePort() {
+        return new NotificationUseCase(messageNotificationPort());
+    }
 }

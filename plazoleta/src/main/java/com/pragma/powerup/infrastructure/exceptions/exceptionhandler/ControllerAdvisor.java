@@ -1,6 +1,7 @@
 package com.pragma.powerup.infrastructure.exceptions.exceptionhandler;
 
 import com.pragma.powerup.infrastructure.exceptions.exception.AuthenticationException;
+import com.pragma.powerup.infrastructure.exceptions.exception.BadRequestException;
 import com.pragma.powerup.infrastructure.exceptions.exception.DataAlreadyExistsException;
 import com.pragma.powerup.infrastructure.exceptions.exception.NoDataFoundException;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,13 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleDataAlreadyExistsException(
             DataAlreadyExistsException ignoredAuthErrorException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(MESSAGE, ignoredAuthErrorException.getMessage()));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Map<String, String>> handleBadRequestException(
+            BadRequestException ignoredAuthErrorException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Collections.singletonMap(MESSAGE, ignoredAuthErrorException.getMessage()));
     }
     

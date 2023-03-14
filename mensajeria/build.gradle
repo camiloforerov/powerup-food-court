@@ -33,7 +33,10 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
 	developmentOnly "org.springframework.boot:spring-boot-devtools:${springBootVersion}"
-	testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+	testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
+		exclude group: "com.vaadin.external.google", module:"android-json"
+	}
+
 
 	runtimeOnly "mysql:mysql-connector-java:${mySqlConnectorVersion}"
 

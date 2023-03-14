@@ -3,7 +3,6 @@ package com.pragma.powerup.infrastructure.out.feign;
 import com.pragma.powerup.infrastructure.out.feign.dto.request.SendNotificationClientDto;
 import com.pragma.powerup.infrastructure.out.feign.exceptions.MessagingServiceErrorDecoder;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -14,6 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 )
 public interface MessagingServiceFeignClient {
     @PostMapping(value = "/employee/send-notification")
-    ResponseEntity<Boolean> sendMessage(@RequestBody SendNotificationClientDto sendNotificationClientDto);
+    boolean sendMessage(@RequestBody SendNotificationClientDto sendNotificationClientDto);
 
 }

@@ -10,6 +10,7 @@ import com.pragma.powerup.application.mapper.IAssignOrderResponseMapper;
 import com.pragma.powerup.application.mapper.IListOrdersResponseMapper;
 import com.pragma.powerup.domain.api.IEmployeeServicePort;
 import com.pragma.powerup.domain.exceptions.EmployeeDoesNotBelongToAnyRestaurantException;
+import com.pragma.powerup.domain.exceptions.NotificationNotSent;
 import com.pragma.powerup.domain.exceptions.OrderDoesNotExistException;
 import com.pragma.powerup.domain.exceptions.OrderIsAlreadyAssignedToChefException;
 import com.pragma.powerup.domain.model.OrderModel;
@@ -84,10 +85,20 @@ public class EmployeeHandler implements IEmployeeHandler {
                 .collect(Collectors.toList());
     }
 
-    //ToDo... comments
+    /**
+     * Changes the order to ready with the order id
+     *
+     * @param orderId - order id
+     * */
     @Override
     public void changeOrderToReady(Long orderId) {
         String employeeEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        this.employeeServicePort.changeOrderToReady(orderId, employeeEmail);
+        try {
+            this.employeeServicePort.changeOrderToReady(orderId, employeeEmail);
+        } catch (EmployeeDoesNotBelongToAnyRestaurantException | NotificationNotSent ex) {
+            throw new ServerErrorException(ex.getMessage());
+        } catch (OrderDoesNotExistException ex) {
+            throw new NoDataFoundException(ex.getMessage());
+        }
     }
 }
