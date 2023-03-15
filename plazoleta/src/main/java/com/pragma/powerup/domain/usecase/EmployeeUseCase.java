@@ -6,6 +6,8 @@ import com.pragma.powerup.domain.exceptions.EmployeeDoesNotBelongToAnyRestaurant
 import com.pragma.powerup.domain.exceptions.NotificationNotSent;
 import com.pragma.powerup.domain.exceptions.OrderDoesNotExistException;
 import com.pragma.powerup.domain.exceptions.OrderIsAlreadyAssignedToChefException;
+import com.pragma.powerup.domain.exceptions.OrderStateCannotChangeException;
+import com.pragma.powerup.domain.exceptions.SecurityCodeIncorrectException;
 import com.pragma.powerup.domain.model.OrderModel;
 import com.pragma.powerup.domain.model.OrderWithDishesModel;
 import com.pragma.powerup.domain.model.RestaurantEmployeeModel;
@@ -104,6 +106,9 @@ public class EmployeeUseCase implements IEmployeeServicePort {
         if (orderModel.isEmpty()) {
             throw new OrderDoesNotExistException("Order couldn't be found");
         }
+        if (!orderModel.get().getState().equals(Constants.ORDER_PREPARATION_STATE)) {
+            throw new OrderStateCannotChangeException("Cannot change to this state");
+        }
         do {
             pinGenerated = this.generatedPinCode();
             foundOrders = orderPersistentPort.getOrdersReadyBySecurityCode(pinGenerated);
@@ -120,6 +125,35 @@ public class EmployeeUseCase implements IEmployeeServicePort {
             throw new NotificationNotSent("Notification couldn't be send");
         }
         return savedOrderModel;
+    }
+
+    /**
+     * Changes the order to 'delivered', verifies the security code is correct
+     *
+     * @param orderId order id
+     * @param employeeEmail employee email
+     * @param securityCode security code to receive the order
+     * */
+    @Override
+    public OrderModel changeOrderToDelivered(Long orderId, String employeeEmail, String securityCode) {
+        Optional<RestaurantEmployeeModel> restaurantEmployeeModel = this.restaurantEmployeePersistentPort
+                .findByEmployeeEmail(employeeEmail);
+        if (restaurantEmployeeModel.isEmpty()) {
+            throw new EmployeeDoesNotBelongToAnyRestaurantException("Employee is not related to any company");
+        }
+        Optional<OrderModel> orderModel = this.orderPersistentPort
+                .getOrderByRestaurantIdAndOrderId(restaurantEmployeeModel.get().getRestaurant().getId(), orderId);
+        if (orderModel.isEmpty()) {
+            throw new OrderDoesNotExistException("Order couldn't be found");
+        }
+        if (orderModel.get().getState() == null || !orderModel.get().getState().equals(Constants.ORDER_READY_STATE)) {
+            throw new OrderStateCannotChangeException("State cannot be changed");
+        }
+        if (orderModel.get().getSecurityPin() == null || !orderModel.get().getSecurityPin().equals(securityCode)) {
+            throw new SecurityCodeIncorrectException("Security code incorrect");
+        }
+        orderModel.get().setState(Constants.ORDER_DELIVERED_STATE);
+        return orderPersistentPort.saveOrder(orderModel.get());
     }
 
     /**

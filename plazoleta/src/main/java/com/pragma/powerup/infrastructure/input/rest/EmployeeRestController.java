@@ -63,4 +63,17 @@ public class EmployeeRestController {
         this.employeeHandler.changeOrderToReady(orderId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @Operation(summary = "Change order to ready state")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "State changed and notified", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Resource not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content)
+    })
+    @PutMapping("/order-delivered")
+    public ResponseEntity<Void> changeOrderToDelivered(@RequestParam("orderId") @Valid Long orderId,
+                                                       @RequestParam("securityCode") @Valid String securityCode) {
+        this.employeeHandler.changeOrderToDelivered(orderId, securityCode);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

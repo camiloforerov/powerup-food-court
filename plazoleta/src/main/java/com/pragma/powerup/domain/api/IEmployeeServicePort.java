@@ -9,4 +9,5 @@ public interface IEmployeeServicePort {
     List<OrderWithDishesModel> listOrdersByState(String orderState, int page, int elementsPerPage, String employeeEmail);
     OrderWithDishesModel assignOrder(String employeeEmail, Long orderId);
     OrderModel changeOrderToReady(Long orderId, String employeeEmail);
+    OrderModel changeOrderToDelivered(Long orderId, String employeeEmail, String securityCode);
 }

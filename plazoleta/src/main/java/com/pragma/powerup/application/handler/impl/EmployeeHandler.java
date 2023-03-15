@@ -13,7 +13,8 @@ import com.pragma.powerup.domain.exceptions.EmployeeDoesNotBelongToAnyRestaurant
 import com.pragma.powerup.domain.exceptions.NotificationNotSent;
 import com.pragma.powerup.domain.exceptions.OrderDoesNotExistException;
 import com.pragma.powerup.domain.exceptions.OrderIsAlreadyAssignedToChefException;
-import com.pragma.powerup.domain.model.OrderModel;
+import com.pragma.powerup.domain.exceptions.OrderStateCannotChangeException;
+import com.pragma.powerup.domain.exceptions.SecurityCodeIncorrectException;
 import com.pragma.powerup.domain.model.OrderWithDishesModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -99,6 +100,27 @@ public class EmployeeHandler implements IEmployeeHandler {
             throw new ServerErrorException(ex.getMessage());
         } catch (OrderDoesNotExistException ex) {
             throw new NoDataFoundException(ex.getMessage());
+        } catch (OrderStateCannotChangeException ex) {
+            throw new BadRequestException(ex.getMessage());
+        }
+    }
+
+    /**
+     * Changes the order to 'delivered' with the order id
+     *
+     * @param orderId order id
+     * */
+    @Override
+    public void changeOrderToDelivered(Long orderId, String securityCode) {
+        String employeeEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        try {
+            this.employeeServicePort.changeOrderToDelivered(orderId, employeeEmail, securityCode);
+        } catch (EmployeeDoesNotBelongToAnyRestaurantException | NotificationNotSent ex) {
+            throw new ServerErrorException(ex.getMessage());
+        } catch (OrderDoesNotExistException ex) {
+            throw new NoDataFoundException(ex.getMessage());
+        } catch (OrderStateCannotChangeException | SecurityCodeIncorrectException ex) {
+            throw new BadRequestException(ex.getMessage());
         }
     }
 }
