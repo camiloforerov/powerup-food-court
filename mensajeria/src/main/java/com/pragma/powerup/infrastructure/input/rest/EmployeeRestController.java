@@ -28,7 +28,7 @@ public class EmployeeRestController {
             @ApiResponse(responseCode = "400", description = "Notification couldn't be sent", content = @Content)
     })
     @PostMapping("/send-notification")
-    public ResponseEntity<Boolean> sendMessageTest(@RequestBody @Valid SendNotificationClientRequestDto sendNotificationClientRequestDto) {
+    public ResponseEntity<Boolean> sendMessageToClient(@RequestBody @Valid SendNotificationClientRequestDto sendNotificationClientRequestDto) {
         return new ResponseEntity<>(this.notificationHandler.notifyClient(sendNotificationClientRequestDto), HttpStatus.OK);
     }
 }

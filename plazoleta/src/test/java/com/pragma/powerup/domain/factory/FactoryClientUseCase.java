@@ -5,6 +5,7 @@ import com.pragma.powerup.domain.model.DishModel;
 import com.pragma.powerup.domain.model.OrderDishModel;
 import com.pragma.powerup.domain.model.OrderModel;
 import com.pragma.powerup.domain.model.RestaurantModel;
+import com.pragma.powerup.domain.model.userservice.UserModel;
 
 import java.util.Date;
 
@@ -49,5 +50,17 @@ public class FactoryClientUseCase {
         OrderModel orderModel = new OrderModel();
         orderModel.setDate(new Date());
         return orderModel;
+    }
+
+    public static UserModel getClientUserModel() {
+        UserModel userModel = new UserModel();
+        userModel.setId(12L);
+        userModel.setName("Camilo");
+        userModel.setLastname("Velez");
+        userModel.setEmail("client@email.com");
+        userModel.setPassword("12345");
+        userModel.setPhone("12343534");
+        userModel.setRole("CLIENT");
+        return userModel;
     }
 }

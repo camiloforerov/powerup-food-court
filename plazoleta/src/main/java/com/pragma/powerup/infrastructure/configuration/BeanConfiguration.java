@@ -106,7 +106,9 @@ public class BeanConfiguration {
 
     @Bean
     public IClientServicePort clientServicePort() {
-        return new ClientUseCase(this.restaurantPersistentPort(), this.dishPersistentPort(), this.orderPersistentPort());
+        return new ClientUseCase(this.restaurantPersistentPort(),
+                this.dishPersistentPort(), this.orderPersistentPort(),
+                this.messagingServicePort(), this.userServicePort());
     }
 
     @Bean

@@ -7,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class SendNotificationClientDto {
     private String phone;
-    private String securityCode;
+    private String message;
 }

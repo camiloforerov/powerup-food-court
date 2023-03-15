@@ -13,4 +13,5 @@ public interface IClientServicePort {
     List<OrderDishModel> newOrder(List<OrderDishModel> dishesOrderData,
                                   Long restaurantId, String clientEmail);
     DishModel getDishModelByIdAndRestaurantId(Long dishId, Long restaurantId);
+    void cancelOrder(Long orderId, String clientEmail);
 }

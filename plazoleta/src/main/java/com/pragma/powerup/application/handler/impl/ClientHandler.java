@@ -4,7 +4,6 @@ import com.pragma.powerup.application.dto.request.DishOrderRequestDto;
 import com.pragma.powerup.application.dto.request.NewOrderDishRequestDto;
 import com.pragma.powerup.application.dto.response.CategorizedDishResponseDto;
 import com.pragma.powerup.application.dto.response.DishOrderResponseDto;
-import com.pragma.powerup.application.dto.response.NewOrderDishResponseDto;
 import com.pragma.powerup.application.dto.response.RestaurantForClientResponseDto;
 import com.pragma.powerup.application.exception.exception.BadRequestException;
 import com.pragma.powerup.application.exception.exception.DataAlreadyExistsException;
@@ -17,12 +16,12 @@ import com.pragma.powerup.domain.api.IClientServicePort;
 import com.pragma.powerup.domain.exceptions.ClientAlreadyHasOrderInProcessException;
 import com.pragma.powerup.domain.exceptions.DishDoesNotExistException;
 import com.pragma.powerup.domain.exceptions.DishesCannotBeEmptyException;
-import com.pragma.powerup.domain.exceptions.NoRestaurantForOwnerFoundException;
+import com.pragma.powerup.domain.exceptions.OrderDoesNotExistException;
+import com.pragma.powerup.domain.exceptions.OrderStateCannotChangeException;
 import com.pragma.powerup.domain.exceptions.RestaurantDoesNotExistException;
 import com.pragma.powerup.domain.model.CategoryWithDishesModel;
 import com.pragma.powerup.domain.model.DishModel;
 import com.pragma.powerup.domain.model.OrderDishModel;
-import com.pragma.powerup.domain.model.RestaurantModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -116,5 +115,23 @@ public class ClientHandler implements IClientHandler {
             throw new NoDataFoundException(ex.getMessage());
         }
 
+    }
+
+    /**
+     * Cancel an order from the client
+     *
+     * @param orderId order id to cancel
+     * @throws NoDataFoundException the order doesn't exist
+     * */
+    @Override
+    public void cancelOrder(Long orderId) {
+        String clientEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        try {
+            this.clientServicePort.cancelOrder(orderId, clientEmail);
+        } catch (OrderDoesNotExistException ex) {
+            throw new NoDataFoundException(ex.getMessage());
+        } catch (OrderStateCannotChangeException ex) {
+            throw new BadRequestException(ex.getMessage());
+        }
     }
 }

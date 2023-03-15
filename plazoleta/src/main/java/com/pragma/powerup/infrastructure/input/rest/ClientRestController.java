@@ -66,4 +66,15 @@ public class ClientRestController {
         return new ResponseEntity<>(this.clientHandler.
                 createNewOrderClient(newOrderDishRequestDto), HttpStatus.CREATED);
     }
+
+    @Operation(summary = "Change order to canceled state")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "State changed or notified that can't be cancelled", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content)
+    })
+    @PutMapping("/order-cancel")
+    public ResponseEntity<Void> cancelOrder(@RequestParam("orderId") @Valid Long orderId) {
+        this.clientHandler.cancelOrder(orderId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

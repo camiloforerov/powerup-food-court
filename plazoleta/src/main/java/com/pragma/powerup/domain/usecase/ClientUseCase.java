@@ -5,21 +5,27 @@ import com.pragma.powerup.domain.api.IClientServicePort;
 import com.pragma.powerup.domain.exceptions.ClientAlreadyHasOrderInProcessException;
 import com.pragma.powerup.domain.exceptions.DishDoesNotExistException;
 import com.pragma.powerup.domain.exceptions.DishesCannotBeEmptyException;
+import com.pragma.powerup.domain.exceptions.OrderDoesNotExistException;
+import com.pragma.powerup.domain.exceptions.OrderStateCannotChangeException;
 import com.pragma.powerup.domain.exceptions.RestaurantDoesNotExistException;
 import com.pragma.powerup.domain.model.CategoryWithDishesModel;
 import com.pragma.powerup.domain.model.DishModel;
 import com.pragma.powerup.domain.model.OrderDishModel;
 import com.pragma.powerup.domain.model.OrderModel;
 import com.pragma.powerup.domain.model.RestaurantModel;
+import com.pragma.powerup.domain.model.userservice.UserModel;
 import com.pragma.powerup.domain.spi.IDishPersistentPort;
+import com.pragma.powerup.domain.spi.IMessagingServicePort;
 import com.pragma.powerup.domain.spi.IOrderPersistentPort;
 import com.pragma.powerup.domain.spi.IRestaurantPersistentPort;
+import com.pragma.powerup.domain.spi.IUserServicePort;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,6 +34,8 @@ public class ClientUseCase implements IClientServicePort {
     private final IRestaurantPersistentPort restaurantPersistentPort;
     private final IDishPersistentPort dishPersistentPort;
     private final IOrderPersistentPort orderPersistentPort;
+    private final IMessagingServicePort messagingServicePort;
+    private final IUserServicePort userServicePort;
 
     /**
      * List restaurants
@@ -143,5 +151,27 @@ public class ClientUseCase implements IClientServicePort {
             throw new DishDoesNotExistException("Dish doesn't exist");
         }
         return dishModel.get();
+    }
+
+    /**
+     * Cancel an order with its id and has to belong the client email
+     *
+     * @param orderId order id to be cancelled
+     * @param clientEmail client email
+     * @throws OrderDoesNotExistException the order was not found
+     * */
+    @Override
+    public void cancelOrder(Long orderId, String clientEmail) {
+        Optional<OrderModel> orderModel = orderPersistentPort.getOrderById(orderId);
+        if (orderModel.isEmpty() || !Objects.equals(orderModel.get().getClientEmail(), clientEmail)) {
+            throw new OrderDoesNotExistException("Order doesn't exists");
+        }
+        if (!orderModel.get().getState().equals(Constants.ORDER_PENDING_STATE)) {
+            UserModel userModel = this.userServicePort.getUserByEmail(clientEmail);
+            this.messagingServicePort.notifyClient(Constants.CANCEL_ORDER_ERROR, userModel.getPhone());
+            throw new OrderStateCannotChangeException("Order cannot be cancelled");
+        }
+        orderModel.get().setState(Constants.ORDER_CANCELED_STATE);
+        orderPersistentPort.saveOrder(orderModel.get());
     }
 }

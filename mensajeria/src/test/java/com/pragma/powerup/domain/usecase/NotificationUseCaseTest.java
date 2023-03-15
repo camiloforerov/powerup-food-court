@@ -1,6 +1,5 @@
 package com.pragma.powerup.domain.usecase;
 
-import com.pragma.powerup.domain.Constants;
 import com.pragma.powerup.domain.spi.IMessageNotificationPort;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,9 +22,8 @@ class NotificationUseCaseTest {
     void mustNotifyClientWithSms() {
         String notificationCode = "1232321";
         String phoneNumber = "+55456654676";
-        String message = Constants.NOTIFICATION_MESSAGE + notificationCode;
 
-        when(messageNotificationPort.sendNotificationToNumber(message, phoneNumber))
+        when(messageNotificationPort.sendNotificationToNumber(notificationCode, phoneNumber))
                 .thenReturn(true);
         boolean result = notificationUseCase.notifyClientSms(notificationCode, phoneNumber);
 
@@ -36,9 +34,8 @@ class NotificationUseCaseTest {
     void mustNotNotifyClientWithSms() {
         String notificationCode = "1232321";
         String phoneNumber = "+55456654676";
-        String message = Constants.NOTIFICATION_MESSAGE + notificationCode;
 
-        when(messageNotificationPort.sendNotificationToNumber(message, phoneNumber))
+        when(messageNotificationPort.sendNotificationToNumber(notificationCode, phoneNumber))
                 .thenReturn(false);
         boolean result = notificationUseCase.notifyClientSms(notificationCode, phoneNumber);
 

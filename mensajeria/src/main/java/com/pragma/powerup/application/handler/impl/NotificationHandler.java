@@ -12,15 +12,15 @@ public class NotificationHandler implements INotificationHandler {
     private final INotificationServicePort notificationServicePort;
 
     /**
-     * Send notification to client with its phone number and a verification code
+     * Send notification to client with its phone number and a message with its verification code
      *
-     * @param sendNotificationClientRequestDto - phone number and message to be send
+     * @param sendNotificationClientRequestDto - phone number and message to be sent
      * @return if the message was sent
      * */
     @Override
     public boolean notifyClient(SendNotificationClientRequestDto sendNotificationClientRequestDto) {
         return this.notificationServicePort.notifyClientSms(
-                sendNotificationClientRequestDto.getSecurityCode(),
+                sendNotificationClientRequestDto.getMessage(),
                 sendNotificationClientRequestDto.getPhone()
         );
     }

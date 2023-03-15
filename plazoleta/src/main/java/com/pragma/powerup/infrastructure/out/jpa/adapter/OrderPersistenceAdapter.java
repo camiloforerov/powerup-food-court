@@ -91,6 +91,12 @@ public class OrderPersistenceAdapter implements IOrderPersistentPort {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Optional<OrderModel> getOrderById(Long orderId) {
+        OrderEntity orderEntity = this.orderRepository.findById(orderId).orElse(null);
+        return Optional.ofNullable(this.orderEntityMapper.toModel(orderEntity));
+    }
+
     private OrderStateType convertStringToOrderStateType(String state) {
         OrderStateType stateToProcess;
         switch (state) {

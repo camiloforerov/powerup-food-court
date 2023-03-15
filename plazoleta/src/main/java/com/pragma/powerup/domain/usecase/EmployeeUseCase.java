@@ -119,8 +119,9 @@ public class EmployeeUseCase implements IEmployeeServicePort {
 
         UserModel userModel = userServicePort.getUserByEmail(orderModel.get().getClientEmail());
 
+        String messageToSend = Constants.NOTIFICATION_MESSAGE + orderModel.get().getSecurityPin();
         boolean notificationMade = messagingServicePort
-                .notifyClientOrderReady(orderModel.get().getSecurityPin(), userModel.getPhone());
+                .notifyClient(messageToSend, userModel.getPhone());
         if (!notificationMade) {
             throw new NotificationNotSent("Notification couldn't be send");
         }

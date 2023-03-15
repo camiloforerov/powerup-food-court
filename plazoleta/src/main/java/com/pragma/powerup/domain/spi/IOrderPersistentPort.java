@@ -16,4 +16,5 @@ public interface IOrderPersistentPort {
                                                                int elementsPerPage, String state);
     Optional<OrderModel> getOrderByRestaurantIdAndOrderId(Long restaurantId, Long orderId);
     List<OrderModel> getOrdersReadyBySecurityCode(String securityPin);
+    Optional<OrderModel> getOrderById(Long orderId);
 }

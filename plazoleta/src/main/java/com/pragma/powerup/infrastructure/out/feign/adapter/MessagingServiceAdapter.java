@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 public class MessagingServiceAdapter implements IMessagingServicePort {
     private final MessagingServiceFeignClient messagingServiceFeignClient;
     @Override
-    public boolean notifyClientOrderReady(String securityPin, String phoneNumber) {
-        return this.messagingServiceFeignClient.sendMessage(new SendNotificationClientDto(phoneNumber, securityPin));
+    public boolean notifyClient(String message, String phoneNumber) {
+        return this.messagingServiceFeignClient.sendMessage(new SendNotificationClientDto(phoneNumber, message));
     }
 }

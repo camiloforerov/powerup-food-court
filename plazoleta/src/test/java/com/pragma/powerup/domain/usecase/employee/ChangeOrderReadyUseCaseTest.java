@@ -87,7 +87,7 @@ class ChangeOrderReadyUseCaseTest {
                 .thenReturn(orderModel);
         when(userServicePort.getUserByEmail(orderModel.getClientEmail()))
                 .thenReturn(userModel);
-        when(messagingServicePort.notifyClientOrderReady(anyString(), eq(clientPhoneNumber)))
+        when(messagingServicePort.notifyClient(anyString(), eq(clientPhoneNumber)))
                 .thenReturn(true);
 
         employeeUseCase.changeOrderToReady(orderId, employeeEmail);
@@ -200,7 +200,7 @@ class ChangeOrderReadyUseCaseTest {
                 .thenReturn(orderModel);
         when(userServicePort.getUserByEmail(orderModel.getClientEmail()))
                 .thenReturn(userModel);
-        when(messagingServicePort.notifyClientOrderReady(anyString(), eq(clientPhoneNumber)))
+        when(messagingServicePort.notifyClient(anyString(), eq(clientPhoneNumber)))
                 .thenReturn(false);
 
         Assertions.assertThrows(

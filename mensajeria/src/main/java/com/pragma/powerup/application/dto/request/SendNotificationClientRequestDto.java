@@ -14,6 +14,7 @@ public class SendNotificationClientRequestDto {
             message = "Phone number must be between 7 and 13 characters")
     @NotBlank(message = "Phone number cannot be blank")
     private String phone;
-    @NotBlank(message = "Security code cannot be blank")
-    private String securityCode;
+    @NotBlank(message = "Message cannot be blank")
+    @Size(min = 3, max = 255)
+    private String message;
 }
